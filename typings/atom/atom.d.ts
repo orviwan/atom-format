@@ -1480,6 +1480,8 @@ declare module AtomCore {
 declare var atom:AtomCore.IAtom;
 
 declare module "atom" {
+	var CompositeDisposable;
+	var NotificationManager;
 	import spacePen = require("space-pen");
 
 	var $:typeof spacePen.$;

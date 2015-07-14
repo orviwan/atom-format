@@ -6,12 +6,12 @@ var ClangFormat = (function () {
     function ClangFormat() {
         var _this = this;
         this.subscriptions = new atom_1.CompositeDisposable();
-        this.subscriptions.add(atom.commands.add('atom-workspace', 'atom-format:format', function () {
-            var editor = atom.workspace.getActiveTextEditor();
-            editor && _this._format(editor.getPath());
-        }));
+        console.log('constructor...');
+        var editor = atom.workspace.getActiveEditor();
+        this.subscriptions.add(editor.onDidSave(function () { _this._format(editor.getPath()); }));
     }
     ClangFormat.prototype.destroy = function () {
+        console.log('destroy...');
         this.subscriptions.dispose();
     };
     ClangFormat.prototype._format = function (filepath) {
@@ -23,9 +23,11 @@ var ClangFormat = (function () {
         if (!fs.existsSync(binary))
             throw new Error("Doesn't bundle the clang-format executable for your platform(" +
                 os.platform() + "_" + os.arch() +
-                "). Consider installing it with your native package manager instead.");
+                "). Consider installing it with your native package manager instead. " +
+                binary);
         var args = JSON.stringify(atom.config.get('atom-format.style'));
-        return child_process_1.execSync(binary + " -i -style=" + args + " " + filepath, { stdio: ['ignore', 'pipe', process.stderr] });
+        console.log(args);
+        return child_process_1.spawn(binary, ['-i', '-style=' + args, filepath], { stdio: ['ignore', 'pipe', process.stderr] });
     };
     return ClangFormat;
 })();

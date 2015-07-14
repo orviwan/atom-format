@@ -1,11 +1,10 @@
 {
     "compilerOptions": {
-        "emitDecoratorMetadata": true,
-        "declaration": true,
+        "emitDecoratorMetadata": false,
+        "declaration": false,
         "module": "commonjs",
         "rootDir": "./src",
-        "sourceMap": true,
-        "sourceRoot": "./src",
+        "sourceMap": false,
         "target": "es5",
         "outDir": "./lib"
     }

@@ -1,8 +1,7 @@
 import {ClangFormat} from './clang-format';
 
 var settings = {
-  config:
-      {executable: {type: 'string', default: undefined}, style: {type: 'string', default: 'file'}},
+  config: {executable: {type: 'string', default: ''}, style: {type: 'string', default: 'file'}},
   activate: () => {
     this.format = new ClangFormat();
   },
@@ -10,3 +9,5 @@ var settings = {
     this.format.destroy();
   }
 };
+
+export = settings;
