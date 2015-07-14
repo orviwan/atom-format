@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "Atom plugin to format code as properly formatted, according to clang-format.",
   "main": "./lib/main",
+  "engines": {"atom": ">=1.0.0"},
   "scripts": {
     "test": "gulp test"
   },
