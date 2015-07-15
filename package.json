@@ -1,6 +1,6 @@
 {
   "name": "atom-format",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Atom plugin to format code as properly formatted, according to clang-format.",
   "main": "./lib/main",
   "engines": {
@@ -25,6 +25,5 @@
     "gulp-format": "^1.0.7",
     "tsd": "^0.6.3"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
