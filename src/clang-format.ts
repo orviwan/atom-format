@@ -2,7 +2,7 @@ import {execSync} from 'child_process';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
-import {CompositeDisposable, NotificationManager} from 'atom';
+import {CompositeDisposable} from 'atom';
 
 export class ClangFormat {
   private subscriptions = new CompositeDisposable();
@@ -10,14 +10,24 @@ export class ClangFormat {
   constructor() {
     this.subscriptions.add(atom.commands.add('atom-workspace', 'atom-format:format', () => {
       var editor = atom.workspace.getActiveTextEditor();
-      editor && this._format(editor.getPath());
+      if (editor) {
+        this._format(editor);
+      }
+    }));
+    this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
+      this.subscriptions.add(editor.getBuffer().onWillSave(() => {
+        var autoSave = atom.config.get('atom-format.autoSave');
+        var extension = (editor.getPath().match(/\..+?$/) || [])[0];
+        if (autoSave.indexOf(extension) >= 0)
+          this._format(editor);
+      }));
     }));
   }
   public destroy() {
     this.subscriptions.dispose();
   }
 
-  private _format(filepath) {
+  private _format(editor) {
     var binary = atom.config.get('atom-format.executable');
     if (!binary) {
       binary = './bin/' + os.platform() + "_" + os.arch() + '/clang-format' +
@@ -29,8 +39,14 @@ export class ClangFormat {
                       os.platform() + "_" + os.arch() +
                       "). Consider installing it with your native package manager instead.");
 
-    var args = JSON.stringify(atom.config.get('atom-format.style'));
-    return execSync(`${binary} -i -style=${args} ${filepath}`,
-                    {stdio: ['ignore', 'pipe', process.stderr]});
+    var command = `${binary}`;
+    var options = {stdio: ['pipe', 'pipe', 'ignore'], input: editor.getText()};
+    var args = {
+      'style': JSON.stringify(atom.config.get('atom-format.style')),
+      'assume-filename': editor.getPath(),
+    };
+    for (var k in args)
+      command += ` -${k}=${args[k]}`;
+    editor.getBuffer().setTextViaDiff(execSync(command, options).toString());
   }
 }

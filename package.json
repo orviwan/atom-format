@@ -25,5 +25,6 @@
     "gulp-format": "^1.0.7",
     "tsd": "^0.6.3"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
