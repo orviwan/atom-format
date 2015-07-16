@@ -1,7 +1,5 @@
-import {execSync} from 'child_process';
-import * as os from 'os';
 import * as fs from 'fs';
-import * as path from 'path';
+import {execSync} from 'child_process';
 import {CompositeDisposable} from 'atom';
 
 export class ClangFormat {
@@ -15,12 +13,20 @@ export class ClangFormat {
       }
     }));
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
-      this.subscriptions.add(editor.getBuffer().onWillSave(() => {
+      var onSave = editor.getBuffer().onWillSave(() => {
         var autoSave = atom.config.get('atom-format.autoSave');
         var extension = (editor.getPath().match(/\..+?$/) || [])[0];
         if (autoSave.indexOf(extension) >= 0)
           this._format(editor);
-      }));
+      });
+      var onDestroy = editor.getBuffer().onDidDestroy(() => {
+        onSave.dispose();
+        onDestroy.dispose();
+        this.subscriptions.remove(onDestroy);
+        this.subscriptions.remove(onSave);
+      });
+      this.subscriptions.add(onSave);
+      this.subscriptions.add(onDestroy);
     }));
   }
   public destroy() {
@@ -28,18 +34,13 @@ export class ClangFormat {
   }
 
   private _format(editor) {
-    var binary = atom.config.get('atom-format.executable');
-    if (!binary) {
-      binary = './bin/' + os.platform() + "_" + os.arch() + '/clang-format' +
-               ((os.platform() === 'win32') ? '.exe' : '');
+    var command = `${atom.config.get('atom-format.executable')}`;
+    if (!fs.existsSync(command)) {
+      atom.notifications.addError(
+          `Doesn't bundle the clang-format executable by your setting path(${command}). Consider setting it with your correct path instead.`);
+      return;
     }
 
-    if (!fs.existsSync(binary))
-      throw new Error("Doesn't bundle the clang-format executable for your platform(" +
-                      os.platform() + "_" + os.arch() +
-                      "). Consider installing it with your native package manager instead.");
-
-    var command = `${binary}`;
     var options = {stdio: ['pipe', 'pipe', 'ignore'], input: editor.getText()};
     var args = {
       'style': JSON.stringify(atom.config.get('atom-format.style')),
