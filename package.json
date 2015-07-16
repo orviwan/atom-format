@@ -1,6 +1,6 @@
 {
   "name": "atom-format",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Atom plugin to format code as properly formatted, according to clang-format.",
   "main": "./lib/main",
   "engines": {
