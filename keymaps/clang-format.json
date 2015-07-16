@@ -1,5 +1,6 @@
 {
   "atom-text-editor": {
-    "alt-shift-f": "atom-format:format"
+    "alt-shift-f": "atom-format:format",
+    "alt-shift-a": "atom-format:autoFormatOnSave"
   }
 }
